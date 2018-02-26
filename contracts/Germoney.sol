@@ -172,8 +172,8 @@ contract Germoney is owned, TokenERC20 {
     uint256 public buyPrice;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function Germoney() TokenERC20(13000000000, "Germoney", "GER") public {
-
+    function Germoney(uint256 _buyPrice) TokenERC20(13000000000, "Germoney", "GER") public {
+        buyPrice = _buyPrice;
     }
 
     /* Internal transfer, only can be called by this contract */

@@ -1,5 +1,5 @@
 const Germoney = artifacts.require('./Germoney.sol');
 
 module.exports = (deployer) => {
-  deployer.deploy(Germoney);
+  deployer.deploy(Germoney, 100);
 };
