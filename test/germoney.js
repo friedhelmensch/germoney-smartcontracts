@@ -28,7 +28,7 @@ contract('Germoney', (accounts) => {
         assert.strictEqual(buyPrice.toNumber(), price);
     });
 
-    it('buy:', async () => {
+    it('buy GER: should be returned by balance of', async () => {
         const price = 1;
         await HST.setPrice(price, { from: accounts[0] });
 
@@ -45,5 +45,45 @@ contract('Germoney', (accounts) => {
 
     });
 
-    //it('set price from non-owner account. Should fail', () => expectThrow(HST.setPrice(0.1, {from: accounts[1]})));
+    it('transfer too much: should be reverted', async () => {
+        const price = 1;
+        await HST.setPrice(price, { from: accounts[0] });
+
+        const buyPrice = await HST.buyPrice.call();
+        assert.strictEqual(buyPrice.toNumber(), price);
+
+        const oneEther = web3.toWei(1, "ether");
+
+        await HST.buy({ from: accounts[2], value: oneEther});
+
+        expectThrow(HST.transfer(accounts[3], oneEther * 2, { from: accounts[2]}));
+
+        const balanceOf3 = await HST.balanceOf.call(accounts[3]);
+        assert.strictEqual(balanceOf3.toNumber(), 0);
+
+        const balanceOf2 = await HST.balanceOf.call(accounts[2]);
+        assert.strictEqual(balanceOf2.toNumber(), oneEther * 1);
+    });
+
+    it('transfer valid amount: should be transfered', async () => {
+        const price = 1;
+        await HST.setPrice(price, { from: accounts[0] });
+
+        const buyPrice = await HST.buyPrice.call();
+        assert.strictEqual(buyPrice.toNumber(), price);
+
+        const oneEther = web3.toWei(1, "ether");
+
+        await HST.buy({ from: accounts[2], value: oneEther});
+
+        await HST.transfer(accounts[3], oneEther * 0.5, { from: accounts[2]});
+
+        const balanceOf3 = await HST.balanceOf.call(accounts[3]);
+        assert.strictEqual(balanceOf3.toNumber(), oneEther * 0.5);
+
+        const balanceOf2 = await HST.balanceOf.call(accounts[2]);
+        assert.strictEqual(balanceOf2.toNumber(), oneEther * 0.5);
+    });
+
+    it('set price from non-owner account. Should fail', () => expectThrow(HST.setPrice(0.1, {from: accounts[1]})));
 });
