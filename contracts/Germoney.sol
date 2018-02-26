@@ -23,8 +23,9 @@ contract TokenERC20 {
     // Public variables of the token
     string public name;
     string public symbol;
-    uint8 public decimals = 18;
+    uint8 public decimals = 2;
     // 18 decimals is the strongly suggested default, avoid changing it
+    // D-Mark only has 2 decimals
     uint256 public totalSupply;
 
     // This creates an array with all balances
