@@ -1,18 +1,18 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.24;
 
 contract owned {
     address public owner;
 
-    function owned() public {
+    constructor() public {
         owner = msg.sender;
     }
 
     modifier onlyOwner {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "not the owner");
         _;
     }
 
-    function transferOwnership(address newOwner) onlyOwner public {
+    function transferOwnership(address newOwner) public onlyOwner {
         owner = newOwner;
     }
 }
@@ -43,8 +43,9 @@ contract TokenERC20 {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    function TokenERC20(uint256 initialSupply, string tokenName, string tokenSymbol) public {
+    constructor (uint256 initialSupply, string tokenName, string tokenSymbol) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
+        emit Transfer(this, this, totalSupply);
         balanceOf[this] = totalSupply;                // Give the creator all initial tokens
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
@@ -66,7 +67,7 @@ contract TokenERC20 {
         balanceOf[_from] -= _value;
         // Add the same to the recipient
         balanceOf[_to] += _value;
-        Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         // Asserts are used to use static analysis to find bugs in your code. They should never fail
         assert(balanceOf[_from] + balanceOf[_to] == previousBalances);
     }
@@ -93,7 +94,7 @@ contract TokenERC20 {
      * @param _value the amount to send
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
-        require(_value <= allowance[_from][msg.sender]);     // Check allowance
+        require(_value <= allowance[_from][msg.sender], "allowance too low");     // Check allowance
         allowance[_from][msg.sender] -= _value;
         _transfer(_from, _to, _value);
         return true;
@@ -137,10 +138,10 @@ contract TokenERC20 {
      * @param _value the amount of money to burn
      */
     function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
+        require(balanceOf[msg.sender] >= _value, "balance insufficient");   // Check if the sender has enough
         balanceOf[msg.sender] -= _value;            // Subtract from the sender
         totalSupply -= _value;                      // Updates totalSupply
-        Burn(msg.sender, _value);
+        emit Burn(msg.sender, _value);
         return true;
     }
 
@@ -153,12 +154,12 @@ contract TokenERC20 {
      * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
-        require(_value <= allowance[_from][msg.sender]);    // Check allowance
+        require(balanceOf[_from] >= _value, "balance insufficient"); // Check if the targeted balance is enough
+        require(_value <= allowance[_from][msg.sender], "allowance too low");    // Check allowance
         balanceOf[_from] -= _value;                         // Subtract from the targeted balance
         allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
         totalSupply -= _value;                              // Update totalSupply
-        Burn(_from, _value);
+        emit Burn(_from, _value);
         return true;
     }
 }
@@ -172,34 +173,34 @@ contract Germoney is owned, TokenERC20 {
     uint256 public buyPrice;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function Germoney(uint256 _buyPrice) TokenERC20(13000000000, "Germoney", "GER") public {
-        buyPrice = _buyPrice;
+    constructor (uint256 _buyPrice) TokenERC20(13000000000, "Germoney", "GER") public {
+        setPrice(_buyPrice);
     }
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0);                               // Prevent transfer to 0x0 address. Use burn() instead
-        require (balanceOf[_from] >= _value);               // Check if the sender has enough
-        require (balanceOf[_to] + _value > balanceOf[_to]); // Check for overflows
+        require (_to != 0x0, "not allowed to burn tokens");             // Prevent transfer to 0x0 address. Use burn() instead
+        require (balanceOf[_from] >= _value, "balance insufficient");   // Check if the sender has enough
+        require (balanceOf[_to] + _value > balanceOf[_to], "overflow detected"); // Check for overflows
         balanceOf[_from] -= _value;                         // Subtract from the sender
         balanceOf[_to] += _value;                           // Add the same to the recipient
-        Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
     }
-
 
     /// @notice Allow users to buy tokens for `newBuyPrice` eth
     /// @param newBuyPrice Price users can buy from the contract
-    function setPrice(uint256 newBuyPrice) onlyOwner public {
+    function setPrice(uint256 newBuyPrice) public onlyOwner {
+        require (newBuyPrice > 0, "price can not be 0");      
         buyPrice = newBuyPrice;
     }
 
     /// @notice Buy tokens from contract by sending ether
-    function buy() payable public {
+    function buy() public payable {
         uint amount = msg.value / buyPrice;               // calculates the amount
         _transfer(this, msg.sender, amount);              // makes the transfers
     }
 
-    function() payable public {
+    function() public payable {
         uint amount = msg.value / buyPrice;               // calculates the amount
         _transfer(this, msg.sender, amount);              // makes the transfers
     }
