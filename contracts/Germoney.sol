@@ -7,9 +7,6 @@ contract Germoney is owned, TokenERC20 {
 
     uint256 public price;
 
-    // This notifies clients about the amount burnt
-    event Debug(string text, uint256 value);
-
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor (uint256 _price) TokenERC20(13000000000, "Germoney", "GER") public {
         require (_price > 0, "price can not be 0");
@@ -18,11 +15,11 @@ contract Germoney is owned, TokenERC20 {
 
     /* Internal transfer, only can be called by this contract */
     function _transfer(address _from, address _to, uint _value) internal {
-        require (_to != 0x0, "not allowed to burn tokens");             // Prevent transfer to 0x0 address. Use burn() instead
-        require (balanceOf[_from] >= _value, "balance insufficient");   // Check if the sender has enough
-        require (balanceOf[_to] + _value > balanceOf[_to], "overflow detected"); // Check for overflows
+        require (_to != 0x0, "not allowed. Use burn instead");      
+        require (balanceOf[_from] >= _value, "balance insufficient");
+        require (balanceOf[_to] + _value > balanceOf[_to], "overflow detected");
         balanceOf[_from] -= _value;                         // Subtract from the sender
-        balanceOf[_to] += _value;                          // Add the same to the recipient
+        balanceOf[_to] += _value;                           // Add the same to the recipient
         emit Transfer(_from, _to, _value);
     }
 
@@ -41,6 +38,5 @@ contract Germoney is owned, TokenERC20 {
 
     function withdraw(address _to) external onlyOwner {
         _to.transfer(address(this).balance);
-        
     }
 }
