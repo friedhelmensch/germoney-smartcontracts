@@ -8,7 +8,7 @@ contract Germoney is owned, TokenERC20 {
     uint256 public price;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    constructor (uint256 _price) TokenERC20(13000000000, "Germoney", "GER") public {
+    constructor (uint256 _price) TokenERC20(13000000000, "Germoney", "GER", 2) public {
         require (_price > 0, "price can not be 0");
         price = _price;
     }

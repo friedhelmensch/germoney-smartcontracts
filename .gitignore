@@ -6,14 +6,9 @@
 
 # secret stuff
 # ================================================
-secrets.json
+config.json
 
 # Generated stuff
 # ================================================
 build
 node_modules
-secrets.json
-
-# Other
-# ================================================
-bower_components

@@ -9,7 +9,8 @@
   "scripts": {
     "compile": "truffle compile",
     "clean": "rm -Rf ./build",
-    "test": "npm run clean && truffle test"
+    "test": "npm run clean && truffle test",
+    "flatten": "mkdir -p build && solidity_flattener --output build/complete.sol contracts/Germoney.sol"
   },
   "repository": {
     "type": "git",

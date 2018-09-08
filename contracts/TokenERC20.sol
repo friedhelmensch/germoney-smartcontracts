@@ -6,9 +6,8 @@ contract TokenERC20 {
     // Public variables of the token
     string public name;
     string public symbol;
-    uint8 public decimals = 2;
-    // 18 decimals is the strongly suggested default, avoid changing it
-    // D-Mark only has 2 decimals
+    uint8 public decimals;
+    
     uint256 public totalSupply;
 
     // This creates an array with all balances
@@ -26,10 +25,11 @@ contract TokenERC20 {
      *
      * Initializes contract with initial supply tokens to the creator of the contract
      */
-    constructor (uint256 initialSupply, string tokenName, string tokenSymbol) public {
+    constructor (uint256 initialSupply, string tokenName, string tokenSymbol, uint8 _decimals) public {
+        decimals = _decimals;
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         emit Transfer(this, this, totalSupply);
-        balanceOf[this] = totalSupply;                // Give the creator all initial tokens
+        balanceOf[this] = totalSupply;                      // Give the contract all initial tokens
         name = tokenName;                                   // Set the name for display purposes
         symbol = tokenSymbol;                               // Set the symbol for display purposes
     }

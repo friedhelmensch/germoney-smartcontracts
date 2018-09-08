@@ -6,7 +6,7 @@ let germoney;
 contract('Germoney', (accounts) => {
     beforeEach(async () => {
         const exchangeRateDMtoEur = 0.511291881;
-        const exchangeRateEthToEur = 700;
+        const exchangeRateEthToEur = 189;
 
         const price = (1 / exchangeRateEthToEur * exchangeRateDMtoEur).toString().substring(0, 18);
         const priceInWei = web3.utils.toWei(price, "ether");
@@ -14,6 +14,17 @@ contract('Germoney', (accounts) => {
         germoney = await GermoneyAbstraction.new(priceInWei, { from: accounts[0] });
     });
 
+    it('aaa_exchangerate', async () => {
+        const exchangeRateDMtoEur = 0.511291881;
+        const exchangeRateEthToEur = 189;
+      
+        const price = (1 / exchangeRateEthToEur * exchangeRateDMtoEur).toString().substring(0, 18);
+        const priceInWei = web3.utils.toWei(price, "ether");
+
+        console.log(priceInWei);
+        console.log(priceInWei / 100);
+    });
+   
 
     it('creation: test total supply', async () => {
         const totalSupply = await germoney.totalSupply.call();
