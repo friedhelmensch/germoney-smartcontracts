@@ -3,7 +3,7 @@ const Germoney = artifacts.require('./Germoney.sol');
 module.exports = (deployer) => {
 
   const exchangeRateDMtoEur = 0.511291881;
-  const exchangeRateEthToEur = 189;
+  const exchangeRateEthToEur = 170;
 
   const price = (1 / exchangeRateEthToEur * exchangeRateDMtoEur).toString().substring(0, 18);
   const priceInWei = web3.utils.toWei(price, "ether");

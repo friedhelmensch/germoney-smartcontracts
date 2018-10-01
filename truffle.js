@@ -1,6 +1,6 @@
 const HDWalletProvider = require('truffle-hdwallet-provider')
 const config = require('./config.json')
-
+const web3 = require("web3");
 // First read in the secrets.json to get our mnemonic
 let mnemonic
 if (config.mnemonic.length > 0) {
@@ -14,13 +14,11 @@ if (config.mnemonic.length > 0) {
 module.exports = {
   networks: {
     live: {
-      network_id: 1 // Ethereum public network
-      // optional config values
-      // host - defaults to "localhost"
-      // port - defaults to 8545
-      // gas
-      // gasPrice
-      // from - default address to use for any transaction Truffle makes during migrations
+      provider: function () {
+        return new HDWalletProvider(mnemonic, "https://mainnet.infura.io/v3/<--mykey-->", 0)
+      },
+      network_id: 1,
+      gasPrice: web3.utils.toWei("8", "gwei"),
     }, rinkeby: {
       provider: function () {
         return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/" + config.infuraKey, 1)
@@ -30,7 +28,8 @@ module.exports = {
     ganache: {
       host: "127.0.0.1",
       port: 8545,
-      network_id: '1234'
+      network_id: '1234',
+      gasPrice: web3.utils.toWei("15", "gwei"),
     }
   }
 }
